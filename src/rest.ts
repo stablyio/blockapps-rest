@@ -379,7 +379,7 @@ async function resolveResults(user, pendingResults, _options:Options) {
 
   // wait until there are no more PENDING results
   const predicate = results =>
-    results.filter(r => r.status === TxResultStatus.PENDING).length === 0;
+    results.filter(r => r === undefined || r.status === TxResultStatus.PENDING).length === 0;
   const action = async () =>
     getBlocResults(
       user,
@@ -948,6 +948,46 @@ async function getArray(user, contract, name, options:Options) {
 async function call(user:BlockChainUser, callArgs:CallArgs, options:Options) {
   const [pendingTxResult] = await api.call(user, callArgs, options);
   return callResolve(user, pendingTxResult, options);
+}
+
+async function callBody(user:BlockChainUser, callArgs:CallArgs, options:Options) {
+  return await api.callBody(user, callArgs, options);
+}
+
+async function sendRaw(user:BlockChainUser, body: any, options:Options) {
+  const pendingTxResult = await api.sendTransactionRaw(user, body, options);
+  // console.log('pendingTxResult', pendingTxResult);
+  return callResolve(user, pendingTxResult, options);
+}
+
+async function resolveResultsNoWaitPending(user, pendingResults, _options:Options) {
+  const options = Object.assign({ isAsync: true }, _options);
+
+  // wait until there are no more PENDING results
+  const predicate = _ => true;
+  const action = async () =>
+    getBlocResults(
+      user,
+      pendingResults.map(r => r.hash),
+      options
+    );
+  const resolvedResults = await util.until(predicate, action, options);
+  return resolvedResults;
+}
+
+async function callResolveNoWait(user, pendingTxResult, options:Options) {
+  // throw if FAILURE
+  assertTxResult(pendingTxResult);
+  // async - do not resolve
+  if (options.isAsync) return pendingTxResult;
+  // resolve - wait until not pending
+  const resolvedTxResult = await resolveResultsNoWaitPending(user, [pendingTxResult], options);
+  // throw if FAILURE
+  assertTxResult(pendingTxResult);
+  // options.isDetailed - return all the data
+  if (options.isDetailed) return resolvedTxResult;
+  // return basic contract object
+  return resolvedTxResult.data.contents;
 }
 
 async function callResolve(user, pendingTxResult, options:Options) {
@@ -1746,6 +1786,7 @@ export default {
   getState,
   getArray,
   call,
+  callBody,
   callList,
   //
   resolveResult,
@@ -1757,6 +1798,7 @@ export default {
   //
   send,
   sendMany,
+  sendRaw,
   //
   search,
   searchUntil,
