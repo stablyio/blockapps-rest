@@ -18,6 +18,7 @@ interface Options {
   chainIds?:any,
   history?:any,
   doNotResolve?:boolean
+  txParams?: any
 }
 
 interface Config {
