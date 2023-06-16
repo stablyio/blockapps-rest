@@ -210,6 +210,17 @@ async function call(user:BlockChainUser, callMethodArgs:CallArgs, options:Option
   return pendingTxResult;
 }
 
+async function callBody(user:BlockChainUser, callMethodArgs:CallArgs, options:Options) {
+  const tx = getCallArgs(callMethodArgs, options);
+  const body = {
+    txs: [tx]
+  };
+  const pendingTxResult = await sendTransactionBody(user, body, options);
+  // console.log('pendingTxResult, ', pendingTxResult);
+  return pendingTxResult;
+}
+
+
 async function callList(user:BlockChainUser, callListArgs:CallArgs[], options:Options) {
   const txs = callListArgs.map(callArgs => getCallArgs(callArgs, options));
   const body = {
@@ -231,6 +242,26 @@ async function sendTransactions(user:OAuthUser, body, options:Options) {
   }
 
   return post(url, endpoint, body, setAuthHeaders(user, sendOptions));
+}
+
+async function sendTransactionBody(user:OAuthUser, body, options:Options) {
+  const url = getNodeUrl(options);
+  const { ...sendOptions } = options;
+
+  let endpoint;
+  endpoint = constructEndpoint(Endpoint.SEND_BODY, sendOptions);
+
+  return post(url, endpoint, body, setAuthHeaders(user, sendOptions));
+}
+
+async function sendTransactionRaw(user: OAuthUser, body, options: Options) {
+  const url = getNodeUrl(options);
+  const { ...sendOptions } = options;
+
+  let endpoint;
+  endpoint = constructEndpoint(Endpoint.SEND_RAW, sendOptions);
+
+  return postRaw(url, endpoint, body, setAuthHeaders(user, sendOptions)); 
 }
 
 function getSendArgs(sendTx:SendTx, options:Options) {
@@ -520,10 +551,12 @@ export default {
   getState,
   getCallArgs,
   call,
+  callBody,
   callList,
   getSendArgs,
   send,
   sendTransactions,
+  sendTransactionRaw,
   getKey,
   createKey,
   search,

@@ -24,6 +24,8 @@ const Endpoint = {
   STATE: `${blocUrl}/contracts/:name/:address/state`,
   TXRESULTS: `${blocUrl}/transactions/results`,
   SEND: `${strato23Url}/transaction`,
+  SEND_RAW: `${strato23Url}/transaction/raw`,
+  SEND_BODY: `${strato23Url}/transaction/body`,
   SEND_PARALLEL: `${strato23Url}/transaction/parallel`,
   KEY: `${strato23Url}/key`,
   SEARCH: `${cirrusUrl}/:name`,
