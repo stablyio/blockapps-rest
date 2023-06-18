@@ -28,6 +28,7 @@ describe("callStably", function () {
   before(async () => {
     const oauth: oauthUtil = await oauthUtil.init(config.nodes[0].oauth);
     let accessToken: AccessToken = await oauth.getAccessTokenByClientSecret();
+    // const userArgs = { token: process.env.USER_TOKEN };
     const userArgs = { token: accessToken.token.access_token };
     admin = await factory.createAdmin(userArgs, options);
   });
@@ -78,7 +79,7 @@ describe("callStably", function () {
   //   "createdAt": 1685980198
   // }
 
-  const contractAddress = "66b198876b9e7448eea5b03a78682eb7cc28e59c";
+  const contractAddress = "620abbefe764ad4cdfbfc0a9c8c1e1885a225c2d";
   const chainID = "e267a05acf9785c72eb15f45118539635c253b28125503fcb6f436fa9b031db2";
   const toAddress = "e2f9682bf68c8c7b92822f9fac136b5ddf285061";
 
@@ -102,6 +103,17 @@ describe("callStably", function () {
   //   assert.equal(stablyContract.name, contractArgs.name, "name");
   //   assert.isOk(util.isAddress(stablyContract.address), "address");
   // })
+
+  it.skip("getAccounts", async () => {
+    const accounts = await rest.getAccounts(admin, {
+      ...options,
+      isAsync: true,
+      query: {
+        address: toAddress
+      }
+    });
+    console.log("get getAccounts", accounts);
+  })
 
   it.skip("get contracts", async () => {
     const [result] = await rest.getContracts(admin, chainID, options);
@@ -146,10 +158,10 @@ describe("callStably", function () {
       chainIds: chainID,
     };
     const [callBodyResult] = await rest.callBody(admin, callArgs, sendOptions);
-    const callResult = await rest.call(admin, callArgs, {...sendOptions, isDetailed: true, txParams: { nonce: callBodyResult.raw.nonce }})
-    console.log('call method body + call', callBodyResult, callResult);
+    const callResult = await rest.call(admin, callArgs, { ...sendOptions, isDetailed: true, txParams: { nonce: callBodyResult.raw.nonce } })
+    // console.log('call method body + call', callBodyResult, callResult);
     assert.equal(callBodyResult.hash, callResult.hash);
-    
+
     // Try to send the same call argument with nonce again
     // const callResult2 = await rest.call(admin, callArgs, {...sendOptions, isDetailed: true, txParams: { nonce: callBodyResult.raw.nonce }})
 
@@ -164,13 +176,13 @@ describe("callStably", function () {
     const methodArgs = { to: toAddress, amount: 100000 };
     const method = "issueTo";
     const callArgs = factory.createCallArgs(contract, method, methodArgs);
-    const [result] = await rest.callBody(admin, callArgs, {
+    const [callBodyResult] = await rest.callBody(admin, callArgs, {
       ...options,
       chainIds: chainID,
     });
 
-    // console.log('result', result);
-    const raw = result.raw;
+    // console.log('result', callBodyResult);
+    const raw = callBodyResult.raw;
     const transactionRaw = {
       address: raw.from,
       "nonce": raw.nonce,
@@ -186,6 +198,7 @@ describe("callStably", function () {
       "metadata": raw.metadata
     };
     const [sendRawResult] = await rest.sendRaw(admin, transactionRaw, { ...options, chainIds: chainID });
-    console.log('sendRawResult', sendRawResult);
+    // console.log('sendRawResult', sendRawResult);
+    assert.equal(callBodyResult.hash, sendRawResult.hash);
   });
 });
