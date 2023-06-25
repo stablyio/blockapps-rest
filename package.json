@@ -9,7 +9,8 @@
     "test": "yarn test:lib && yarn test:util",
     "test:lib": "mocha --require=@babel/register lib/test/*.test.js -b",
     "test:util": "mocha --require=@babel/register lib/util/test/*.test.js -b",
-    "token-getter": "ts-node --require=@babel/register src/util/oauth.client.ts"
+    "token-getter": "ts-node --require=@babel/register src/util/oauth.client.ts",
+    "token-getter-user": "ts-node --require=@babel/register src/util/oauth.client.ts --flow authorization-code --config config.yaml"
   },
   "keywords": [
     "BlockApps",
@@ -60,7 +61,7 @@
     "@babel/register": "^7.8.4",
     "@types/mocha": "^8.0.3",
     "@types/node": "^18.0.0",
-    "babel-preset-minify": "^0.5.1",
+    "babel-preset-minify": "^0.4.3",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-plugin-import": "^2.13.0",

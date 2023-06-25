@@ -157,7 +157,7 @@ async function getContracts(user:OAuthUser, chainId, options:Options) {
   const url = getNodeUrl(options);
   const endpoint = constructEndpoint(Endpoint.CONTRACTS, {
     ...options,
-    chainIds: [chainId]
+    // chainIds: [chainId]
   });
   return get(url, endpoint, setAuthHeaders(user, options));
 }

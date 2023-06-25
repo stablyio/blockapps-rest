@@ -5,7 +5,6 @@ import * as unixTime from "unix-time";
 import * as getPem from "rsa-pem-from-mod-exp";
 import axios from "axios";
 import "@babel/polyfill";
-import { OAuthUser } from "../types";
 
 interface OAuthConfig {
   appTokenCookieName:any,
@@ -133,6 +132,7 @@ class OAuthUtil {
           authorizePath: o.openIdConfig.authorization_endpoint
         }
       };
+      // console.log('@@oauth', o.tokenHost, o.openIdConfig.token_endpoint);
 
       o.oauth2 = simpleOauth.create(credentials);
 

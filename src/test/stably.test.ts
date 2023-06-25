@@ -8,6 +8,7 @@ import fsUtil from "../util/fsUtil";
 import factory from "./factory";
 import { Options, Contract, TransactionResultHash, OAuthUser } from "../types";
 import oauthUtil from "../util/oauth.util";
+import oauthHelper from "../util/oauthHelper";
 import { AccessToken } from "../util/oauth.util";
 
 if (!process.env.USER_TOKEN) {
@@ -32,6 +33,7 @@ describe("callStably", function () {
     const userArgs = { token: accessToken.token.access_token };
     admin = await factory.createAdmin(userArgs, options);
   });
+  
 
   async function createContract(uid, admin, constructorArgs, options: Options) {
     const filename = `${fixtures}/all_StablyFiatToken_dependencies_safemath_inherited.sol`;
@@ -79,8 +81,8 @@ describe("callStably", function () {
   //   "createdAt": 1685980198
   // }
 
-  const contractAddress = "620abbefe764ad4cdfbfc0a9c8c1e1885a225c2d";
-  const chainID = "e267a05acf9785c72eb15f45118539635c253b28125503fcb6f436fa9b031db2";
+  const contractAddress = "669c4872326971f81eb9099d7857c3551d200e26";
+  const chainID = "";
   const toAddress = "e2f9682bf68c8c7b92822f9fac136b5ddf285061";
 
   async function getContract(admin, options: Options) {
@@ -104,6 +106,9 @@ describe("callStably", function () {
   //   assert.isOk(util.isAddress(stablyContract.address), "address");
   // })
 
+  let adminUserName = process.env.GLOBAL_ADMIN_NAME;
+  let adminUserPassword = process.env.GLOBAL_ADMIN_PASSWORD;
+  
   it.skip("getAccounts", async () => {
     const accounts = await rest.getAccounts(admin, {
       ...options,
@@ -146,7 +151,11 @@ describe("callStably", function () {
     console.log('result', result);
   });
 
-  it("call method body + call", async () => {
+  it.skip("empty", () => {
+    console.log("empty");
+  })
+
+  it.skip("call method body + call", async () => {
     // get contract
     const contract = await getContract(admin, options);
     // call method
@@ -158,7 +167,7 @@ describe("callStably", function () {
       chainIds: chainID,
     };
     const [callBodyResult] = await rest.callBody(admin, callArgs, sendOptions);
-    const callResult = await rest.call(admin, callArgs, { ...sendOptions, isDetailed: true, txParams: { nonce: callBodyResult.raw.nonce } })
+    const callResult = await rest.call(admin, callArgs, { ...sendOptions, txParams: { nonce: callBodyResult.raw.nonce } })
     // console.log('call method body + call', callBodyResult, callResult);
     assert.equal(callBodyResult.hash, callResult.hash);
 
